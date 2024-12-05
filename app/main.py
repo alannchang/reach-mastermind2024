@@ -29,11 +29,18 @@ def generate_random_numbers():
             return []
 
 def check_quota():
+    '''
+    Documentation regarding quota/checker: https://www.random.org/clients/http/#quota
+    Base quota = 1,000,000 bits
+    Quota is decreased by number of bits required for each request
+    Every day, shortly after midnight UTC, all quotas with less than 1,000,000 bits receive a free top-up of 200,000 bits. 
+    If the server has spare capacity, you may get an additional free top-up earlier, but you should not count on it.
+    '''
     try:
         response = requests.get(QUOTA_API)
         response.raise_for_status()
 
-        return response.text
+        return int(response.text[:-1])      # [:-1] to remove newline character
     except requests.RequestException as e:
         print(f"Error fetching data from www.random.org: {e}")
         return ""
@@ -52,7 +59,8 @@ async def random_numbers():
     else:
         return HTTPException(status_code=500, detail="Error fetching random numbers")
 
-@app.get('/check_quota')
+
+@app.get('/quota')
 async def quota_checker():
     return check_quota()
     
