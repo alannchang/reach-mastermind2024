@@ -22,13 +22,16 @@ class GameSession:
 
     def validate_input(self, player_code):
         if len(player_code) != len(self.secret_code):
-            print("Invalid input! Please try again.")
             return False
+        return True
 
 
     def code_check(self, player_code):
         correct_num, correct_loc = self.find_matches(player_code)
-        self.print_result(correct_num, correct_loc)
+        self.max_attempts -= 1
+        if correct_loc == len(self.secret_code):
+            self.victory = True
+        return correct_num, correct_loc
 
 
     def find_matches(self, player_code):
@@ -73,7 +76,7 @@ class GameSession:
 
 
     def game_loop(self):
-        print(self.secret_code)
+        print(self.secret_code)     # For debugging
         
         while self.victory == False and self.max_attempts > 0:
             player_input = input("What's your guess? Please follow this format: 1 2 3 4\n")
@@ -89,6 +92,3 @@ class GameSession:
         else:
             print("YOU LOSE!")
 
-
-new_game = GameSession(4, 10)
-new_game.game_loop()
