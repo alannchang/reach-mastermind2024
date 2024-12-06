@@ -1,6 +1,10 @@
 import random
 
+
 def temp_random_list(nums):
+    '''
+    This function will be replaced with the random.org API for generating random numbers
+    '''
     random_nums = []
     for x in range(0, nums):
         random_nums.append(random.randint(0, 7))
@@ -8,6 +12,7 @@ def temp_random_list(nums):
 
 
 class GameSession:
+
 
     def __init__(self, total_random_nums=4, max_attempts=10):
         self.secret_code = temp_random_list(total_random_nums)
@@ -19,12 +24,14 @@ class GameSession:
         if len(player_code) != len(self.secret_code):
             print("Invalid input! Please try again.")
             return False
-        
-    def check_correct(self, player_code):
-        if len(self.secret_code) != len(player_code):
-            print("Invalid guess! Try again!")
-            return
 
+
+    def code_check(self, player_code):
+        correct_num, correct_loc = self.find_matches(player_code)
+        self.print_result(correct_num, correct_loc)
+
+
+    def find_matches(self, player_code):
         correct_num = 0
         correct_loc = 0
         incorrect_secret = []
@@ -48,6 +55,10 @@ class GameSession:
                 correct_num += 1
                 secret_count[num] -= 1
 
+        return correct_num, correct_loc
+
+
+    def print_result(self, correct_num, correct_loc): 
         if correct_num == 0 and correct_loc == 0:
             print("All incorrect.")
         else:
@@ -58,21 +69,26 @@ class GameSession:
               return
 
         self.max_attempts -= 1
-        print(f"{self.max_attempts} guesses remaining.")
+        print(f"{self.max_attempts} attempts remaining.")
+
 
     def game_loop(self):
         print(self.secret_code)
+        
         while self.victory == False and self.max_attempts > 0:
             player_input = input("What's your guess? Please follow this format: 1 2 3 4\n")
-            if self.validate_input(player_input) == False:
-                continue
             player_code = list(map(int, player_input.split()))
-            self.check_correct(player_code)
+
+            if self.validate_input(player_code) == False:
+                continue
+
+            self.code_check(player_code)
 
         if self.victory:
             print("YOU WIN!")
         else:
             print("YOU LOSE!")
+
 
 new_game = GameSession(4, 10)
 new_game.game_loop()
