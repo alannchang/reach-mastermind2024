@@ -4,7 +4,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import List, Optional
 
-from game_logic import GameSession
+from logic import GameSession
 
 app = FastAPI()
 
