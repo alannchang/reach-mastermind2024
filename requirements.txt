@@ -6,11 +6,9 @@ charset-normalizer==3.4.0
 click==8.1.7
 exceptiongroup==1.2.2
 fastapi==0.115.6
-Flask==3.1.0
 h11==0.14.0
 idna==3.10
 itsdangerous==2.2.0
-Jinja2==3.1.4
 MarkupSafe==3.0.2
 pydantic==2.10.3
 pydantic_core==2.27.1

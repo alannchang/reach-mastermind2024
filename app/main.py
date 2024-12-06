@@ -1,66 +1,65 @@
+import random
+import uuid
 from fastapi import FastAPI, HTTPException
-import requests
+from pydantic import BaseModel
+from typing import List, Optional
+
+from logic import GameSession
 
 app = FastAPI()
 
-RANDOM_NUM_API = 'https://www.random.org/integers/'
-QUOTA_API = 'https://www.random.org/quota/?format=plain'
+# Temporary in-memory store for game sessions
+games = {}
 
-def generate_random_numbers():
-    params = {
-            'num': 4,
-            'min': 0,
-            'max': 7,
-            'col': 1,
-            'base': 10,
-            'format': 'plain',
-            'rnd': 'new',
-            }
-
-    try:
-        response = requests.get(RANDOM_NUM_API, params=params)
-        response.raise_for_status()
-
-        numbers = response.text.strip().split()
-        return list(map(int, numbers))
-
-    except requests.RequestException as e:
-            print(f"Error fetching data from www.random.org: {e}")
-            return []
-
-def check_quota():
-    '''
-    Documentation regarding quota/checker: https://www.random.org/clients/http/#quota
-    Base quota = 1,000,000 bits
-    Quota is decreased by number of bits required for each request
-    Every day, shortly after midnight UTC, all quotas with less than 1,000,000 bits receive a free top-up of 200,000 bits. 
-    If the server has spare capacity, you may get an additional free top-up earlier, but you should not count on it.
-    '''
-    try:
-        response = requests.get(QUOTA_API)
-        response.raise_for_status()
-
-        return int(response.text[:-1])      # [:-1] to remove newline character
-    except requests.RequestException as e:
-        print(f"Error fetching data from www.random.org: {e}")
-        return ""
+# Request models
+class NewGameRequest(BaseModel):
+    total_random_nums: int = 4
+    max_attempts: int = 10
 
 
-@app.get("/")
-async def read_root():
-    return {"message": "FastAPI is set up!"}
+class GuessRequest(BaseModel):
+    session_id: str
+    guess: List[int]
 
 
-@app.get('/random_numbers')
-async def random_numbers():
-    numbers = generate_random_numbers()
-    if numbers:
-        return numbers
-    else:
-        return HTTPException(status_code=500, detail="Error fetching random numbers")
+@app.post("/start_game/")
+def start_game(request: NewGameRequest):
+    # Create a new game session
+    session_id = str(uuid.uuid4())
+    game = GameSession(request.total_random_nums, request.max_attempts)
+    games[session_id] = game
+    return {"session_id": session_id, "message": "Game started!"}
 
 
-@app.get('/quota')
-async def quota_checker():
-    return check_quota()
-    
+@app.post("/guess/")
+def guess(request: GuessRequest):
+    session_id = request.session_id
+    player_code = request.guess
+
+    # Fetch the game session
+    game = games.get(session_id)
+    if not game:
+        raise HTTPException(status_code=404, detail="Game session not found.")
+
+    if game.victory:
+        return {"message": "Game already won!"}
+
+    if game.max_attempts <= 0:
+        return {"message": "Game over. You've used all attempts."}
+
+    if not game.validate_input(player_code):
+        raise HTTPException(status_code=400, detail="Invalid input length.")
+
+    correct_num, correct_loc = game.code_check(player_code)
+    if game.victory:
+        return {"message": "You win!", "secret_code": game.secret_code}
+
+    if game.max_attempts <= 0:
+        return {"message": "You lose!", "secret_code": game.secret_code}
+
+    return {
+        "correct_numbers": correct_num,
+        "correct_locations": correct_loc,
+        "attempts_remaining": game.max_attempts,
+    }
+
