@@ -1,15 +1,19 @@
-import random
-import uuid
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List, Optional
+from typing import List
+from redis import Redis
+import uuid
+import json
 
 from logic import GameSession
 
 app = FastAPI()
 
-# Temporary in-memory store for game sessions
-games = {}
+
+# Connect to Redis
+redis_host = "redis"
+redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
+
 
 # Request models
 class NewGameRequest(BaseModel):
@@ -22,12 +26,28 @@ class GuessRequest(BaseModel):
     guess: List[int]
 
 
+def save_game(session_id: str, game: GameSession):
+    redis_client.hset(session_id, mapping=game.to_dict())
+
+
+def load_game(session_id: str) -> GameSession:
+    data = redis_client.hgetall(session_id)
+    if not data:
+        return None
+
+    data["secret_code"] = json.loads(data["secret_code"])
+    data["max_attempts"] = int(data["max_attempts"])
+    data["attempts_remaining"] = int(data["attempts_remaining"])
+    data["victory"] = data["victory"].lower() == "true"
+    return GameSession.from_dict(data)
+
+
 @app.post("/start_game/")
 def start_game(request: NewGameRequest):
     # Create a new game session
     session_id = str(uuid.uuid4())
-    game = GameSession(request.total_random_nums, request.max_attempts)
-    games[session_id] = game
+    game = GameSession(total_random_nums=request.total_random_nums, max_attempts=request.max_attempts)
+    save_game(session_id, game)
     return {"session_id": session_id, "message": "Game started!"}
 
 
@@ -37,29 +57,33 @@ def guess(request: GuessRequest):
     player_code = request.guess
 
     # Fetch the game session
-    game = games.get(session_id)
+    game = load_game(session_id)
     if not game:
         raise HTTPException(status_code=404, detail="Game session not found.")
 
     if game.victory:
-        return {"message": "Game already won!"}
+        return {"message": "Game already won!", "secret_code": game.secret_code}
 
-    if game.max_attempts <= 0:
-        return {"message": "Game over. You've used all attempts."}
+    if game.attempts_remaining <= 0:
+        return {"message": "Game over. You've used all attempts.", "secret_code": game.secret_code}
 
     if not game.validate_input(player_code):
         raise HTTPException(status_code=400, detail="Invalid input length.")
 
     correct_num, correct_loc = game.code_check(player_code)
+
+    save_game(session_id, game)
+
     if game.victory:
         return {"message": "You win!", "secret_code": game.secret_code}
 
-    if game.max_attempts <= 0:
+    if game.attempts_remaining <= 0:
         return {"message": "You lose!", "secret_code": game.secret_code}
 
     return {
         "correct_numbers": correct_num,
         "correct_locations": correct_loc,
-        "attempts_remaining": game.max_attempts,
+        "attempts_remaining": game.attempts_remaining,
     }
 
+# @app.post("/stats/")      # Will need to implement this as some point
