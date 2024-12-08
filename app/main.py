@@ -26,7 +26,13 @@ class GuessRequest(BaseModel):
     guess: List[int]
 
 
+class StatsRequest(BaseModel):
+    session_id: str
+
+
 def save_game(session_id: str, game: GameSession):
+    data = game.to_dict()
+    print("Saving to Redis:", data)      # debug
     redis_client.hset(session_id, mapping=game.to_dict())
 
 
@@ -34,8 +40,10 @@ def load_game(session_id: str) -> GameSession:
     data = redis_client.hgetall(session_id)
     if not data:
         return None
+    print("Loaded from Redis:", data)   # debug
 
     data["secret_code"] = json.loads(data["secret_code"])
+    data["history"] = json.loads(data["history"])
     data["max_attempts"] = int(data["max_attempts"])
     data["attempts_remaining"] = int(data["attempts_remaining"])
     data["victory"] = data["victory"].lower() == "true"
@@ -87,14 +95,14 @@ def guess(request: GuessRequest):
     }
 
 @app.post("/stats/")
-def retrieve_stats(session_id: str):
-    game = load_game(session_id)
+def retrieve_stats(request: StatsRequest):
+    game = load_game(request.session_id)
     if not game:
         raise HTTPException(status_code=404, detail="Unable to locate game session.")
 
     return {
-        "correct_numbers": correct_num,
-        "correct_locations": correct_loc,
-        "attempts_remaining": game.attempts_remaining
+        "attempts_remaining": game.attempts_remaining,
+        "max_attempts": game.max_attempts,
+        "history": game.history
     }
 

@@ -64,11 +64,13 @@ class GameSession:
 
     def record_history(self, player_code, correct_num, correct_loc):
         self.history.append(
-                {"player input": player_code,
-                 "correct number": correct_num,
-                 "correct location": correct_loc,
-                 "attempts remaining": self.attempts_remaining,
-                 }
+                {
+                "player input": player_code,
+                "correct number": correct_num,
+                "correct location": correct_loc,
+                "attempts remaining": self.attempts_remaining,
+                }
+        )
     
 
     def to_dict(self):
@@ -76,7 +78,8 @@ class GameSession:
                 "secret_code": json.dumps(self.secret_code) if isinstance(self.secret_code, list) else self.secret_code,
                 "max_attempts": self.max_attempts,
                 "attempts_remaining": self.attempts_remaining,
-                "victory": int(self.victory)
+                "victory": int(self.victory),
+                "history": json.dumps(self.history) if self.history else "[]"
                 }
 
 
@@ -84,15 +87,19 @@ class GameSession:
     def from_dict(data):
 
         secret_code = data.get("secret_code")
+        history = data.get("history", "[]")
         # Deserialize only if secret_code is a string
         if isinstance(secret_code, str):
             secret_code = json.loads(secret_code)
+        if isinstance(history, str):
+            history = json.loads(history)
 
         return GameSession(
                 secret_code=secret_code,
                 max_attempts=int(data.get("max_attempts")),
                 attempts_remaining=int(data.get("attempts_remaining")),
-                victory=bool(int(data.get("victory")))
+                victory=bool(int(data.get("victory"))),
+                history=history
                 )
 
 
