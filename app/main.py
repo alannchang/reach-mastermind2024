@@ -59,7 +59,7 @@ def guess(request: GuessRequest):
     # Fetch the game session
     game = load_game(session_id)
     if not game:
-        raise HTTPException(status_code=404, detail="Game session not found.")
+        raise HTTPException(status_code=404, detail="Unable to locate game session.")
 
     if game.victory:
         return {"message": "Game already won!", "secret_code": game.secret_code}
@@ -86,4 +86,15 @@ def guess(request: GuessRequest):
         "attempts_remaining": game.attempts_remaining,
     }
 
-# @app.post("/stats/")      # Will need to implement this as some point
+@app.post("/stats/")
+def retrieve_stats(session_id: str):
+    game = load_game(session_id)
+    if not game:
+        raise HTTPException(status_code=404, detail="Unable to locate game session.")
+
+    return {
+        "correct_numbers": correct_num,
+        "correct_locations": correct_loc,
+        "attempts_remaining": game.attempts_remaining
+    }
+

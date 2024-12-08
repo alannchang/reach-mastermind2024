@@ -46,7 +46,7 @@ The servers should be running (in Docker containers) now.
 Example:
 
 ```
-curl -X POST "http://127.0.0.1:8000/start_game/" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
+curl -X POST "http://127.0.0.1:8080/start_game/" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
 
 ```
 
@@ -58,7 +58,7 @@ curl -X POST "http://127.0.0.1:8000/start_game/" -H "Content-Type: application/j
 Example:
 
 ```
-curl -X POST "http://127.0.0.1:8000/guess/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
+curl -X POST "http://127.0.0.1:8080/guess/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
 
 ```
 

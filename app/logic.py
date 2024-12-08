@@ -14,10 +14,11 @@ def temp_random_list(nums):
 class GameSession:
 
 
-    def __init__(self, total_random_nums=4, max_attempts=10, secret_code=None, attempts_remaining=None, victory=False):
+    def __init__(self, total_random_nums=4, max_attempts=10, secret_code=None, attempts_remaining=None, history=None, victory=False):
         self.secret_code = secret_code or temp_random_list(total_random_nums)
         self.max_attempts = max_attempts
         self.attempts_remaining = attempts_remaining if attempts_remaining is not None else max_attempts
+        self.history = history if history is not None else []
         self.victory = False
 
 
@@ -28,6 +29,7 @@ class GameSession:
     def code_check(self, player_code):
         correct_num, correct_loc = self.find_matches(player_code)
         self.attempts_remaining -= 1
+        self.record_history(player_code, correct_num, correct_loc)
         if correct_loc == len(self.secret_code):
             self.victory = True
         return correct_num, correct_loc
@@ -59,6 +61,15 @@ class GameSession:
 
         return correct_num, correct_loc
 
+
+    def record_history(self, player_code, correct_num, correct_loc):
+        self.history.append(
+                {"player input": player_code,
+                 "correct number": correct_num,
+                 "correct location": correct_loc,
+                 "attempts remaining": self.attempts_remaining,
+                 }
+    
 
     def to_dict(self):
         return {
