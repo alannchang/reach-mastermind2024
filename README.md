@@ -36,14 +36,14 @@ docker compose up -d
 
 The servers should be running (in Docker containers) now.
 
-### There are currently two endpoints for the game server:
+### There are currently three API endpoints for the game server:
 
 - POST /start_game/ 
     - Send a POST request to create a new game session, specifying how many numbers to include 
       in the number combination and maximum number of attempts.
     - You'll receive a session_id to track your game session.
 
-Example:
+Example using curl:
 
 ```
 curl -X POST "http://127.0.0.1:8080/start_game/" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
@@ -51,14 +51,27 @@ curl -X POST "http://127.0.0.1:8080/start_game/" -H "Content-Type: application/j
 ```
 
 - POST /guess/
-    - Send a POST request with the session_id and your guess (list of integers).
+    - Send a POST request with the "session_id" and your guess (list of integers).
     - You'll receive a response indicating how many numbers and positions are correct, and 
       how many attempts are remaining.
 
-Example:
+Example using curl:
 
 ```
 curl -X POST "http://127.0.0.1:8080/guess/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
 
 ```
+- POST /stats/
+  - Send a POST request with the "session_id" to get information on your game session
+  - Information provided includes:
+    - Maximum number of attempts
+    - Number of attempts remaining
+    - Prior history of guesses
 
+Example using curl:
+
+```
+curl -X POST "http://127.0.0.1:8080/stats/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
+
+```
+-
