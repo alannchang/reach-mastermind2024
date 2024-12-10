@@ -50,7 +50,7 @@ def load_game(session_id: str) -> GameSession:
     return GameSession.from_dict(data)
 
 
-@app.post("/start_game/")
+@app.post("/mastermind/start_game/")
 def start_game(request: NewGameRequest):
     # Create a new game session
     session_id = str(uuid.uuid4())
@@ -59,7 +59,7 @@ def start_game(request: NewGameRequest):
     return {"session_id": session_id, "message": "Game started!"}
 
 
-@app.post("/guess/")
+@app.post("/mastermind/guess/")
 def guess(request: GuessRequest):
     session_id = request.session_id
     player_code = request.guess
@@ -94,7 +94,7 @@ def guess(request: GuessRequest):
         "attempts_remaining": game.attempts_remaining,
     }
 
-@app.post("/stats/")
+@app.post("/mastermind/stats/")
 def retrieve_stats(request: StatsRequest):
     game = load_game(request.session_id)
     if not game:

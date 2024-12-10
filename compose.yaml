@@ -35,7 +35,7 @@ services:
 
   redis_game_state_replica:
     image: redis:latest
-    command: redis-server --replicaof redis_game_state1 6379 
+    command: redis-server --replicaof redis_game_state_primary 6379 
     restart: always
     networks:
       mastermind:
@@ -64,7 +64,7 @@ services:
 
   redis_number_store_replica:
     image: redis:latest
-    command: redis-server --replicaof redis_number_store1 6379
+    command: redis-server --replicaof redis_number_store_primary 6379
     restart: always
     networks:
       mastermind:

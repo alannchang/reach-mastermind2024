@@ -56,13 +56,13 @@ def check_quota():
         return ""
 
 
-@app.get("/")
+@app.get("/number_factory/")
 async def read_root():
-    return {"message": "Up and running!"}
+    return {"message": "Random number factory up and running!"}
 
 
-@app.get('/random_numbers')
-async def random_numbers():
+@app.get('/number_factory/generate')
+async def generate():
     numbers = generate_random_numbers()
     if numbers:
         return numbers
@@ -70,7 +70,7 @@ async def random_numbers():
         return HTTPException(status_code=500, detail="Error fetching random numbers")
 
 
-@app.get('/quota')
+@app.get('/number_factory/quota')
 async def quota_checker():
     return check_quota()
 
