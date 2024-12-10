@@ -6,9 +6,14 @@ app = FastAPI()
 RANDOM_NUM_API = 'https://www.random.org/integers/'
 QUOTA_API = 'https://www.random.org/quota/?format=plain'
 
-def generate_random_numbers():
+
+def generate_random_numbers(qty=4):
+    '''
+    possible values for 'num'.....1-1000
+    for generating in bulk, set to 1000 (see bulk_generate())
+    '''
     params = {
-            'num': 4,
+            'num': qty,
             'min': 0,
             'max': 7,
             'col': 1,
@@ -27,6 +32,11 @@ def generate_random_numbers():
     except requests.RequestException as e:
             print(f"Error fetching data from www.random.org: {e}")
             return []
+
+
+def bulk_generate():
+    return generate_random_numbers(1000)
+
 
 def check_quota():
     '''
@@ -48,7 +58,7 @@ def check_quota():
 
 @app.get("/")
 async def read_root():
-    return {"message": "FastAPI is set up!"}
+    return {"message": "Up and running!"}
 
 
 @app.get('/random_numbers')
@@ -63,4 +73,4 @@ async def random_numbers():
 @app.get('/quota')
 async def quota_checker():
     return check_quota()
-    
+
