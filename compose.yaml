@@ -15,7 +15,7 @@ services:
 
   api:
     build:
-      context: ./server
+      context: ./game
       dockerfile: Dockerfile
     restart: always
     deploy:

@@ -11,7 +11,7 @@ app = FastAPI()
 
 
 # Connect to Redis
-redis_host = "redis"
+redis_host = "redis_game_state_primary"
 redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
 
 
