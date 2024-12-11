@@ -22,7 +22,7 @@ guess the number combination.
 - Docker
 - Redis (caching)
 
-## Usage
+## How to get started
 
 Git clone to download the repo:
 ```
@@ -35,8 +35,12 @@ docker compose build
 docker compose up -d
 ```
 
-The servers will be running in Docker containers now.  
-The game can be played by sending API requests to the following endpoints:
+The servers will be running in Docker containers now.
+
+At this point, there are many ways to play the game in its current state:
+- Manually sending API requests (using the curl command)
+- By accessing the FastAPI docs for the game server and sending requests from there 
+- By executing the play.py (in progress) script
 
 ### Game server API endpoints:
 
@@ -49,7 +53,6 @@ Example using curl:
 
 ```
 curl -X POST "http://127.0.0.1:80/mastermind/start_game" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
-
 ```
 
 - POST /mastermind/guess
@@ -60,7 +63,6 @@ Example using curl:
 
 ```
 curl -X POST "http://127.0.0.1:80/mastermind/guess" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
-
 ```
 
 - POST /mastermind/stats
@@ -74,7 +76,6 @@ Example using curl:
 
 ```
 curl -X POST "http://127.0.0.1:80/mastermind/stats" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
-
 ```
 
 ### Number Factory API endpoints:
@@ -86,7 +87,6 @@ Example using curl:
 
 ```
 curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: application/json" -d '{"qty": 4}'
-
 ```
 
 - GET /number_factory/quota
@@ -99,6 +99,7 @@ curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: app
 
 - Configure random number server so that random numbers are generated and added to redis number store on regular intervals
 - Configure game server to pull random numbers from redis number store
+- Implement measures to prevent redis number store from completely depleting
 - Implement proper (input) data validation, especially for the player guesses
 - Set up database for storing completed game session history, so Redis doesn't have to
 - Set up Redis Sentinels, Master-Slave architecture

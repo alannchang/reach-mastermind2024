@@ -9,7 +9,7 @@ QUOTA_API = 'https://www.random.org/quota/?format=plain'
 
 app = FastAPI(root_path="/number_factory")
 
-redis_host = "redis_game_state_primary"
+redis_host = "redis_number_store_primary"
 redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
 
 
@@ -75,11 +75,11 @@ async def read_root():
 @app.post('/generate')
 async def generate(request: GenerateRequest):
     '''
-    Generate random numbers.
+    Generate random numbers and stores them in Redis.
     Args:
-        qty (int): The quantity of random numbers you wish to generate.
+        qty (int): The quantity of random numbers to generate.
     Returns:
-        numbers (list): A list of random numbers.
+        message (dict): Confirmation generation and storage in Redis.
     '''
     if not (1 <= request.qty <= 1000):
         raise HTTPException(status_code=400, detail="qty must be between 1 and 1000.")
@@ -88,8 +88,19 @@ async def generate(request: GenerateRequest):
 
     if not numbers:
         raise HTTPException(status_code=500, detail="Error fetching random numbers.")
-    return {"numbers": numbers}
+    
+    redis_client.rpush("random_numbers", *numbers)
 
+    return {
+        "message": f"{len(numbers)} successfully generated and stored.",
+        "stored_numbers": numbers
+    }
+
+'''
+To monitor redis activity while the serveris running:
+docker logs redis_number_store_primary
+docker exec -it redis_number_store_primary redis-cli monitor
+'''
 
 @app.get('/quota')
 async def quota_checker():
