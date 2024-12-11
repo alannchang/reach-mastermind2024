@@ -14,8 +14,8 @@ redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
 
 
 # Request models
-class GenerateNumbers(BaseModel):
-    qty: int = 4
+class GenerateRequest(BaseModel):
+    qty: int
 
 
 def generate_random_numbers(qty=4):
@@ -27,7 +27,7 @@ def generate_random_numbers(qty=4):
             'num': qty,
             'min': 0,
             'max': 7,
-            'col': qty,
+            'col': 1,
             'base': 10,
             'format': 'plain',
             'rnd': 'new',
@@ -37,9 +37,8 @@ def generate_random_numbers(qty=4):
         response = requests.get(RANDOM_NUM_API, params=params)
         response.raise_for_status()
 
-        # numbers = response.text.strip().split()
-        # return list(map(int, numbers))
-        return response.text
+        numbers = response.text.strip().split()
+        return list(map(int, numbers))
 
     except requests.RequestException as e:
             print(f"Error fetching data from www.random.org: {e}")
@@ -73,13 +72,15 @@ async def read_root():
     return {"message": "Random number factory up and running!"}
 
 
-@app.get('/number_factory/generate')
-async def generate(request: GenerateNumbers):
+@app.post('/number_factory/generate')
+async def generate(request: GenerateRequest):
+    if not (1 <= request.qty <= 1000):
+        raise HTTPException(status_code=400, detail="qty must be between 1 and 1000.")
+
     numbers = generate_random_numbers(request.qty)
-    if numbers:
-        return numbers
-    else:
-        return HTTPException(status_code=500, detail="Error fetching random numbers")
+    if not numbers:
+        raise HTTPException(status_code=500, detail="Error fetching random numbers.")
+    return {"numbers": numbers}
 
 
 @app.get('/number_factory/quota')

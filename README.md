@@ -38,7 +38,7 @@ The servers should be running (in Docker containers) now.
 
 ### There are currently three API endpoints for the game server:
 
-- POST /mastermind/start_game/ 
+- POST /mastermind/start_game 
     - Send a POST request to create a new game session, specifying how many numbers to include 
       in the number combination and maximum number of attempts.
     - You'll receive a session_id to track your game session. Please keep this session_id.
@@ -46,21 +46,21 @@ The servers should be running (in Docker containers) now.
 Example using curl:
 
 ```
-curl -X POST "http://127.0.0.1:8080/mastermind/start_game/" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
+curl -X POST "http://127.0.0.1:80/mastermind/start_game/" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
 
 ```
 
-- POST /mastermind/guess/
+- POST /mastermind/guess
     - Send a POST request using the "session_id" provided from "start_game" request and your guess (list of integers).
     - You'll receive a response indicating how many numbers and positions are correct, and how many attempts are remaining.
 
 Example using curl:
 
 ```
-curl -X POST "http://127.0.0.1:8080/mastermind/guess/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
+curl -X POST "http://127.0.0.1:80/mastermind/guess/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
 
 ```
-- POST /mastermind/stats/
+- POST /mastermind/stats
   - Send a POST request with your "session_id" to get information on your game session
   - Information provided includes:
     - Maximum number of attempts
@@ -70,7 +70,7 @@ curl -X POST "http://127.0.0.1:8080/mastermind/guess/" -H "Content-Type: applica
 Example using curl:
 
 ```
-curl -X POST "http://127.0.0.1:8080/mastermind/stats/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
+curl -X POST "http://127.0.0.1:80/mastermind/stats/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
 
 ```
 
@@ -87,7 +87,7 @@ curl -X POST "http://127.0.0.1:8080/mastermind/stats/" -H "Content-Type: applica
 Example using curl:
 
 ```
-curl -X POST "http://127.0.0.1:8080/number_factory/generate/" -H "Content-Type: application/json" -d '{"qty": "4"}'
+curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: application/json" -d '{"qty": 4}'
 
 ```
 
