@@ -51,7 +51,7 @@ def load_game(session_id: str) -> GameSession:
 
 
 @app.post("/mastermind/start_game")
-def start_game(request: NewGameRequest):
+async def start_game(request: NewGameRequest):
     # Create a new game session
     session_id = str(uuid.uuid4())
     game = GameSession(total_random_nums=request.total_random_nums, max_attempts=request.max_attempts)
@@ -60,7 +60,7 @@ def start_game(request: NewGameRequest):
 
 
 @app.post("/mastermind/guess")
-def guess(request: GuessRequest):
+async def guess(request: GuessRequest):
     session_id = request.session_id
     player_code = request.guess
 
@@ -95,7 +95,7 @@ def guess(request: GuessRequest):
     }
 
 @app.post("/mastermind/stats")
-def retrieve_stats(request: StatsRequest):
+async def retrieve_stats(request: StatsRequest):
     game = load_game(request.session_id)
     if not game:
         raise HTTPException(status_code=404, detail="Unable to locate game session.")

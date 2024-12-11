@@ -78,6 +78,7 @@ async def generate(request: GenerateRequest):
         raise HTTPException(status_code=400, detail="qty must be between 1 and 1000.")
 
     numbers = generate_random_numbers(request.qty)
+
     if not numbers:
         raise HTTPException(status_code=500, detail="Error fetching random numbers.")
     return {"numbers": numbers}

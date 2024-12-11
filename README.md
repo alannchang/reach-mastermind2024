@@ -100,6 +100,7 @@ curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: app
 ## TO DO List
 
 - Configure random number server so that random numbers are generated and added to redis number store on regular intervals
+- Configure game server to pull random numbers from redis number store
 - Implement proper (input) data validation, especially for the player guesses
 - Set up database for storing completed game session history
 - Set up Redis Sentinels, Master-Slave architecture
