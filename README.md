@@ -96,3 +96,12 @@ curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: app
     - Once your bit allowance is exhausted, the number factory will not longer be able to generate new random numbers 
       at its current IP address.  More details can be found at: https://www.random.org/clients/http/#quota
   - This endpoint is simply an internal wrapper of the quota checking API service provided by random.org.
+
+## TO DO List
+
+- Configure random number server so that random numbers are generated and added to redis number store on regular intervals
+- Implement proper (input) data validation, especially for the player guesses
+- Set up database for storing completed game session history
+- Set up Redis Sentinels, Master-Slave architecture
+
+
