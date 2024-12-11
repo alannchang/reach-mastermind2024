@@ -73,6 +73,16 @@ async def start_game(request: NewGameRequest):
 
 @app.post("/guess")
 async def guess(request: GuessRequest):
+    '''
+    Submit a guess as to what the number combination/code is.
+    Args:
+        session_id (str): The ID provided when you started your game session.
+        player_code (list): Your guess in the form of a list of integers.
+    Returns:
+        correct_numbers (int): How many numbers are correct regardless of location.
+        correct_locations (int): How many numbers are in the correct location.
+        attempts_remaining (int): How many attempts you have remaining.
+    '''
     session_id = request.session_id
     player_code = request.guess
 
@@ -108,6 +118,15 @@ async def guess(request: GuessRequest):
 
 @app.post("/stats")
 async def retrieve_stats(request: StatsRequest):
+    '''
+    Get information on your game session.
+    Args:
+        session_id (str): The ID provided when you started your game session.
+    Returns:
+        attempts_remaining (int): The number of attempts remaining.
+        max_attempts (int): The number of attempts you started with.
+        history (list): History of guesses and their feedback.
+    '''
     game = load_game(request.session_id)
     if not game:
         raise HTTPException(status_code=404, detail="Unable to locate game session.")

@@ -74,6 +74,13 @@ async def read_root():
 
 @app.post('/generate')
 async def generate(request: GenerateRequest):
+    '''
+    Generate random numbers.
+    Args:
+        qty (int): The quantity of random numbers you wish to generate.
+    Returns:
+        numbers (list): A list of random numbers.
+    '''
     if not (1 <= request.qty <= 1000):
         raise HTTPException(status_code=400, detail="qty must be between 1 and 1000.")
 
@@ -86,5 +93,12 @@ async def generate(request: GenerateRequest):
 
 @app.get('/quota')
 async def quota_checker():
+    '''
+    Check on your current bit allowance.
+    Args:
+        None
+    Returns:
+        Allowance (string): Your current bit allowance in string format.
+    '''
     return check_quota()
 
