@@ -7,7 +7,7 @@ import json
 
 from logic import GameSession
 
-app = FastAPI()
+app = FastAPI(root_path="/mastermind")
 
 
 # Connect to Redis
@@ -50,8 +50,20 @@ def load_game(session_id: str) -> GameSession:
     return GameSession.from_dict(data)
 
 
-@app.post("/mastermind/start_game")
+@app.get("/")
+async def root():
+    return {"docs_url": app.docs_url, "redoc_url": app.redoc_url}
+
+
+@app.post("/start_game")
 async def start_game(request: NewGameRequest):
+    '''
+    Create a new game session.
+    Args:
+        {"total_random_nums": 4, "max_attempts": 10}
+    Returns:
+        {"session_id": session_id, "message": "Game started!"}
+    '''
     # Create a new game session
     session_id = str(uuid.uuid4())
     game = GameSession(total_random_nums=request.total_random_nums, max_attempts=request.max_attempts)
@@ -59,7 +71,7 @@ async def start_game(request: NewGameRequest):
     return {"session_id": session_id, "message": "Game started!"}
 
 
-@app.post("/mastermind/guess")
+@app.post("/guess")
 async def guess(request: GuessRequest):
     session_id = request.session_id
     player_code = request.guess
@@ -94,7 +106,7 @@ async def guess(request: GuessRequest):
         "attempts_remaining": game.attempts_remaining,
     }
 
-@app.post("/mastermind/stats")
+@app.post("/stats")
 async def retrieve_stats(request: StatsRequest):
     game = load_game(request.session_id)
     if not game:

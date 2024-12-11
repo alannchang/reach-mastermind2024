@@ -7,7 +7,7 @@ import requests
 RANDOM_NUM_API = 'https://www.random.org/integers/'
 QUOTA_API = 'https://www.random.org/quota/?format=plain'
 
-app = FastAPI()
+app = FastAPI(root_path="/number_factory")
 
 redis_host = "redis_game_state_primary"
 redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
@@ -67,12 +67,12 @@ def check_quota():
         return ""
 
 
-@app.get("/number_factory/")
+@app.get("/")
 async def read_root():
-    return {"message": "Random number factory up and running!"}
+    return {"docs_url": app.docs_url, "redoc_url": app.redoc_url}
 
 
-@app.post('/number_factory/generate')
+@app.post('/generate')
 async def generate(request: GenerateRequest):
     if not (1 <= request.qty <= 1000):
         raise HTTPException(status_code=400, detail="qty must be between 1 and 1000.")
@@ -84,7 +84,7 @@ async def generate(request: GenerateRequest):
     return {"numbers": numbers}
 
 
-@app.get('/number_factory/quota')
+@app.get('/quota')
 async def quota_checker():
     return check_quota()
 

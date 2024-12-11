@@ -20,6 +20,7 @@ guess the number combination.
 - FastAPI 
 - Nginx (load balancer) 
 - Docker
+- Redis (caching)
 
 ## Usage
 
