@@ -101,6 +101,7 @@ curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: app
 - Configure game server to pull random numbers from redis number store
 - Implement measures to prevent redis number store from completely depleting
 - Implement proper (input) data validation, especially for the player guesses
+- Implement a dashboard, logging, etc. for better visibility on system
 - Set up database for storing completed game session history, so Redis doesn't have to
 - Set up Redis Sentinels, Master-Slave architecture
 - Expiration timer if players take too long to complete a game
