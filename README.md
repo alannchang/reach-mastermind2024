@@ -38,7 +38,7 @@ The servers should be running (in Docker containers) now.
 
 ### There are currently three API endpoints for the game server:
 
-- POST /start_game/ 
+- POST /mastermind/start_game/ 
     - Send a POST request to create a new game session, specifying how many numbers to include 
       in the number combination and maximum number of attempts.
     - You'll receive a session_id to track your game session. Please keep this session_id.
@@ -50,7 +50,7 @@ curl -X POST "http://127.0.0.1:8080/mastermind/start_game/" -H "Content-Type: ap
 
 ```
 
-- POST /guess/
+- POST /mastermind/guess/
     - Send a POST request using the "session_id" provided from "start_game" request and your guess (list of integers).
     - You'll receive a response indicating how many numbers and positions are correct, and how many attempts are remaining.
 
@@ -60,7 +60,7 @@ Example using curl:
 curl -X POST "http://127.0.0.1:8080/mastermind/guess/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
 
 ```
-- POST /stats/
+- POST /mastermind/stats/
   - Send a POST request with your "session_id" to get information on your game session
   - Information provided includes:
     - Maximum number of attempts
@@ -73,4 +73,26 @@ Example using curl:
 curl -X POST "http://127.0.0.1:8080/mastermind/stats/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
 
 ```
--
+
+### There are currently three API endpoints for the "number factory" server:
+
+- GET /number_factory/
+  - Sends a simple GET request to check the online status of the server.  
+  - The message "Random number factory up and running!" will be displayed if the server is running.
+
+
+- POST /number_factory/generate
+  - Send a POST request to generate random numbers 
+
+Example using curl:
+
+```
+curl -X POST "http://127.0.0.1:8080/number_factory/generate/" -H "Content-Type: application/json" -d '{"qty": "4"}'
+
+```
+
+- GET /number_factory/quota
+  - Send a GET request to check on your current bit allowance.  Your bit allowance is used for generating random numbers.
+    - Once your bit allowance is exhausted, the number factory will not longer be able to generate new random numbers 
+      at its current IP address.  More details can be found at: https://www.random.org/clients/http/#quota
+  - This endpoint is simply an internal wrapper of the quota checking API service provided by random.org.

@@ -1,10 +1,21 @@
 from fastapi import FastAPI, HTTPException
+from pydantic import BaseModel
+from redis import Redis
+import json
 import requests
-
-app = FastAPI()
 
 RANDOM_NUM_API = 'https://www.random.org/integers/'
 QUOTA_API = 'https://www.random.org/quota/?format=plain'
+
+app = FastAPI()
+
+redis_host = "redis_game_state_primary"
+redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
+
+
+# Request models
+class GenerateNumbers(BaseModel):
+    qty: int = 4
 
 
 def generate_random_numbers(qty=4):
@@ -16,7 +27,7 @@ def generate_random_numbers(qty=4):
             'num': qty,
             'min': 0,
             'max': 7,
-            'col': 1,
+            'col': qty,
             'base': 10,
             'format': 'plain',
             'rnd': 'new',
@@ -26,8 +37,9 @@ def generate_random_numbers(qty=4):
         response = requests.get(RANDOM_NUM_API, params=params)
         response.raise_for_status()
 
-        numbers = response.text.strip().split()
-        return list(map(int, numbers))
+        # numbers = response.text.strip().split()
+        # return list(map(int, numbers))
+        return response.text
 
     except requests.RequestException as e:
             print(f"Error fetching data from www.random.org: {e}")
@@ -62,8 +74,8 @@ async def read_root():
 
 
 @app.get('/number_factory/generate')
-async def generate():
-    numbers = generate_random_numbers()
+async def generate(request: GenerateNumbers):
+    numbers = generate_random_numbers(request.qty)
     if numbers:
         return numbers
     else:
