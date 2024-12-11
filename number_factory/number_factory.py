@@ -73,9 +73,9 @@ async def read_root():
 
 
 @app.post('/generate')
-async def generate(request: GenerateRequest):
+def generate(request: GenerateRequest):
     '''
-    Generate random numbers and stores them in Redis.
+    Generate random numbers and stores them in Redis. (Synchronous operation to reduce burden on random.org server)
     Args:
         qty (int): The quantity of random numbers to generate.
     Returns:
