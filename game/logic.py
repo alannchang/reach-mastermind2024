@@ -1,21 +1,16 @@
 import random
 import json
+from redis import Redis
 
-def temp_random_list(nums):
-    '''
-    This function will be replaced with the random.org API for generating random numbers
-    '''
-    random_nums = []
-    for x in range(0, nums):
-        random_nums.append(random.randint(0, 7))
-    return random_nums
+redis_host = "redis_number_store_primary"
+redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
 
 
 class GameSession:
 
 
-    def __init__(self, total_random_nums=4, max_attempts=10, secret_code=None, attempts_remaining=None, history=None, victory=False):
-        self.secret_code = secret_code or temp_random_list(total_random_nums)
+    def __init__(self, secret_code, total_random_nums=4, max_attempts=10, attempts_remaining=None, history=None, victory=False):
+        self.secret_code = secret_code
         self.max_attempts = max_attempts
         self.attempts_remaining = attempts_remaining if attempts_remaining is not None else max_attempts
         self.history = history if history is not None else []

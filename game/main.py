@@ -10,10 +10,9 @@ from logic import GameSession
 app = FastAPI(root_path="/mastermind")
 
 
-# Connect to Redis
-redis_host = "redis_game_state_primary"
-redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
-
+# Connect to both game state and number store Redis instances
+redis_game_state = Redis(host="redis_game_state_primary", port=6379, decode_responses=True)
+redis_num_store = Redis(host="redis_number_store_primary", port=6379, decode_responses=True)
 
 # Request models
 class NewGameRequest(BaseModel):
@@ -33,11 +32,11 @@ class StatsRequest(BaseModel):
 def save_game(session_id: str, game: GameSession):
     data = game.to_dict()
     print("Saving to Redis:", data)      # debug
-    redis_client.hset(session_id, mapping=game.to_dict())
+    redis_game_state.hset(session_id, mapping=game.to_dict())
 
 
 def load_game(session_id: str) -> GameSession:
-    data = redis_client.hgetall(session_id)
+    data = redis_game_state.hgetall(session_id)
     if not data:
         return None
     print("Loaded from Redis:", data)   # debug
@@ -48,6 +47,17 @@ def load_game(session_id: str) -> GameSession:
     data["attempts_remaining"] = int(data["attempts_remaining"])
     data["victory"] = data["victory"].lower() == "true"
     return GameSession.from_dict(data)
+
+
+def generate_secret_code(qty):
+    pipeline = redis_num_store.pipeline()
+    pipeline.lrange("random_numbers", 0, qty - 1)
+    pipeline.ltrim("random_numbers", qty, -1)
+    result = pipeline.execute()
+
+    if not result[0]:
+        return []
+    return list(map(int, result[0]))
 
 
 @app.get("/")
@@ -64,9 +74,12 @@ async def start_game(request: NewGameRequest):
     Returns:
         {"session_id": session_id, "message": "Game started!"}
     '''
-    # Create a new game session
+    secret_code = generate_secret_code(request.total_random_nums)
+    if not secret_code:
+        raise HTTPException(status_code=503, detail="Service temporarily unavailable.  Please try again later.")
+
     session_id = str(uuid.uuid4())
-    game = GameSession(total_random_nums=request.total_random_nums, max_attempts=request.max_attempts)
+    game = GameSession(secret_code, total_random_nums=request.total_random_nums, max_attempts=request.max_attempts)
     save_game(session_id, game)
     return {"session_id": session_id, "message": "Game started!"}
 
