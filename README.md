@@ -35,9 +35,10 @@ docker compose build
 docker compose up -d
 ```
 
-The servers should be running (in Docker containers) now.
+The servers will be running in Docker containers now.  
+The game can be played by sending API requests to the following endpoints:
 
-### There are currently three API endpoints for the game server:
+### Game server API endpoints:
 
 - POST /mastermind/start_game 
     - Send a POST request to create a new game session, specifying how many numbers to include 
@@ -61,6 +62,7 @@ Example using curl:
 curl -X POST "http://127.0.0.1:80/mastermind/guess" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
 
 ```
+
 - POST /mastermind/stats
   - Send a POST request with your "session_id" to get information on your game session
   - Information provided includes:
@@ -75,12 +77,7 @@ curl -X POST "http://127.0.0.1:80/mastermind/stats" -H "Content-Type: applicatio
 
 ```
 
-### There are currently three API endpoints for the "number factory" server:
-
-- GET /number_factory/
-  - Sends a simple GET request to check the online status of the server.  
-  - The message "Random number factory up and running!" will be displayed if the server is running.
-
+### Number Factory API endpoints:
 
 - POST /number_factory/generate
   - Send a POST request to generate random numbers 
@@ -103,7 +100,7 @@ curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: app
 - Configure random number server so that random numbers are generated and added to redis number store on regular intervals
 - Configure game server to pull random numbers from redis number store
 - Implement proper (input) data validation, especially for the player guesses
-- Set up database for storing completed game session history
+- Set up database for storing completed game session history, so Redis doesn't have to
 - Set up Redis Sentinels, Master-Slave architecture
-
+- Expiration timer if players take too long to complete a game
 
