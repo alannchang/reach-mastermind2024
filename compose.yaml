@@ -8,12 +8,12 @@ services:
     volumes:
       - ./nginx.conf:/etc/nginx/nginx.conf:ro
     depends_on:
-      - api
+      - game_server
       - number_factory
     networks:
       - mastermind
 
-  api:
+  game_server:
     build:
       context: ./game
       dockerfile: Dockerfile

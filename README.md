@@ -46,7 +46,7 @@ The servers should be running (in Docker containers) now.
 Example using curl:
 
 ```
-curl -X POST "http://127.0.0.1:80/mastermind/start_game/" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
+curl -X POST "http://127.0.0.1:80/mastermind/start_game" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
 
 ```
 
@@ -57,7 +57,7 @@ curl -X POST "http://127.0.0.1:80/mastermind/start_game/" -H "Content-Type: appl
 Example using curl:
 
 ```
-curl -X POST "http://127.0.0.1:80/mastermind/guess/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
+curl -X POST "http://127.0.0.1:80/mastermind/guess" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
 
 ```
 - POST /mastermind/stats
@@ -70,7 +70,7 @@ curl -X POST "http://127.0.0.1:80/mastermind/guess/" -H "Content-Type: applicati
 Example using curl:
 
 ```
-curl -X POST "http://127.0.0.1:80/mastermind/stats/" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
+curl -X POST "http://127.0.0.1:80/mastermind/stats" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
 
 ```
 
