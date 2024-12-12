@@ -76,8 +76,8 @@ class GameSession:
                 "max_attempts": self.max_attempts,
                 "attempts_remaining": self.attempts_remaining,
                 "victory": int(self.victory),
-                "history": json.dumps(self.history) if self.history else "[]"
-                "timestamp":self.timestamp.isoformat()
+                "history": json.dumps(self.history) if self.history else "[]",
+                "timestamp": self.timestamp.isoformat()
                 }
 
 
@@ -97,7 +97,7 @@ class GameSession:
                 max_attempts=int(data.get("max_attempts")),
                 attempts_remaining=int(data.get("attempts_remaining")),
                 victory=bool(int(data.get("victory"))),
-                history=history
+                history=history,
                 timestamp=datetime.fromisoformat(data["timestamp"])
                 )
 
