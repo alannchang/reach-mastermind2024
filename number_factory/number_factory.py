@@ -25,9 +25,9 @@ class GenerateRequest(BaseModel):
 
 def generate_random_numbers(qty=4):
     '''
-    Docs: https://www.random.org/clients/http/api/
+    Random integer generator api docs: https://www.random.org/clients/http/api/
     Possible values for 'num'.....1-1000
-    for generating in bulk, set to 1000 (see bulk_generate())
+    For generating in bulk, set to 1000
     '''
     params = {
             'num': qty,
@@ -53,9 +53,9 @@ def generate_random_numbers(qty=4):
 
 def check_quota():
     '''
-    Docs regard quota checker API endpoint: https://www.random.org/clients/http/#quota
+    Quota checker api docs: https://www.random.org/clients/http/#quota
     Base quota = 1,000,000 bits
-    Quota is decreased by number of bits required for each request, replenished nightly.
+    Quota is decreased by number of bits required for each request, replenished daily.
     '''
     try:
         response = requests.get(QUOTA_API)

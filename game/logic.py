@@ -1,10 +1,6 @@
 import random
 import json
 from datetime import datetime
-from redis import Redis
-
-redis_host = "redis_number_store_primary"
-redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
 
 
 class GameSession:

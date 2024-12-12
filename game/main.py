@@ -120,10 +120,10 @@ async def guess(request: GuessRequest):
     save_game(session_id, game)
 
     if game.victory:
-        return {"message": "You win!", "secret_code": game.secret_code}
+        return {"message": "You win! Start a new game session to play again.", "secret_code": game.secret_code}
 
     if game.attempts_remaining <= 0:
-        return {"message": "You lose!", "secret_code": game.secret_code}
+        return {"message": "You lose! Start a new game session to try again.", "secret_code": game.secret_code}
 
     return {
         "correct_numbers": correct_num,
