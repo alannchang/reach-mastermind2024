@@ -15,12 +15,17 @@ guess the number combination.
 
 - Random Integer Generator API (https://www.random.org/clients/http/api/) must be utilized for generating true random numbers.
 
+## Features
+
+
+
 ## Stack/Technologies
 
 - FastAPI 
-- Nginx (load balancer) 
+- Nginx (load balancing) 
 - Docker
 - Redis (caching)
+- 
 
 ## How to get started
 
@@ -103,12 +108,10 @@ docker-compose down --volumes --rmi all
 Note: removing volumes will remove all data including data stored on databases.
 
 ## TO DO List
-
-- Configure random number server so that random numbers are generated and added to redis number store on regular intervals
-- Implement measures to prevent redis number store from completely depleting
+- Timestamps for game session management, auto-expiration, etc. 
+- Set up database (Postgres?) for persistent storage
 - Implement proper (input) data validation, especially for the player guesses
 - Implement a dashboard, logging, etc. for better visibility on system
-- Set up database for storing completed game session history, so Redis doesn't have to
 - Set up Redis Sentinels, Master-Slave architecture
 - Expiration timer if players take too long to complete a game
 
