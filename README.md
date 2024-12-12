@@ -8,12 +8,12 @@ guess the number combination.
 
 ## Requirements
 
-- The user must have a way to interact/interface(i.e. command line, mobile app, web page, etc.) including:
-  - Ability to guess the combination of numbers
-  - Ability to view history of guesses and feedback received
-  - Ability to view number of guesses remaining
+The user must have a way to interact/interface(i.e. command line, mobile app, web page, etc.) including:
+- Ability to guess the combination of numbers
+- Ability to view history of guesses and feedback received
+- Ability to view number of guesses remaining
 
-- Random Integer Generator API (https://www.random.org/clients/http/api/) must be utilized for generating true random numbers.
+Random Integer Generator API (https://www.random.org/clients/http/api/) must be utilized for generating true random numbers.
 
 The following parameters should be used to make the call to the API:
 |URL Parameter|Recommended Value|Purpose|
@@ -26,11 +26,7 @@ The following parameters should be used to make the call to the API:
 |format|plain|Returns response in a plain text|
 |rnd|new|Generate a new random numbers|
 
-- Any choice/combination of programming languages, tools, frameworks, etc. are permitted within reason(e.g. a game framework should not be used to implement the Mastermind game) 
-
-## Features
-
-
+Any choice/combination of programming languages, tools, frameworks, etc. are permitted within reason(e.g. a game framework should not be used to implement the Mastermind game) 
 
 ## Stack/Technologies
 
