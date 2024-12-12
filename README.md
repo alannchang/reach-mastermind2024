@@ -99,12 +99,12 @@ curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: app
     - Once your bit allowance is exhausted, the number factory will not longer be able to generate new random numbers 
       at its current IP address.  More details can be found at: https://www.random.org/clients/http/#quota
 
-
-To stop all activity and remove all containers, images, and builds:
+To clean up the project by stopping and removing all containers, images, and builds:
 ```
 docker-compose down --volumes --rmi all
 ```
-Note: removing volumes will remove all data including data stored on databases.
+Remove the "--volumes" flag to preserve the volumes for future use (i.e. to keep the data).
+
 
 ## TO DO List
 - Set up database (Postgres?) for persistent storage
