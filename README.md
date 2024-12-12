@@ -1,19 +1,32 @@
 # REACH Backend Take Home Challenge
 ## Objective
 
-To implement a mastermind game, where a user plays against the computer and tries to guess a number combination or "code".
+To implement a Mastermind game, where a user plays against the computer and tries to guess a number combination or "code".
 At the end of each attempt, the computer will tell the player how many numbers are correct numbers and how
 many numbers are in the correct position/location.  Players are only allowed a fixed number of attempts to correctly
 guess the number combination.
 
 ## Requirements
 
-- The user must have a way to interact/interface(i.e. command line, mobile app, web page, etc.):
-  - Ability to guess
-  - Ability to view previous guesses and receive feedback from the application
-  - Number of guesses remaining
+- The user must have a way to interact/interface(i.e. command line, mobile app, web page, etc.) including:
+  - Ability to guess the combination of numbers
+  - Ability to view history of guesses and feedback received
+  - Ability to view number of guesses remaining
 
 - Random Integer Generator API (https://www.random.org/clients/http/api/) must be utilized for generating true random numbers.
+
+The following parameters should be used to make the call to the API:
+|URL Parameter|Recommended Value|Purpose|
+|-|-|-|
+|num|4|Number of integers requested|
+|min|0|The smallest value returned|
+|max|7|The largest value returned|
+|col|1|Number of columns used to display the returned values|
+|base|10|Use base 10 system|
+|format|plain|Returns response in a plain text|
+|rnd|new|Generate a new random numbers|
+
+- Any choice/combination of programming languages, tools, frameworks, etc. are permitted within reason(e.g. a game framework should not be used to implement the Mastermind game) 
 
 ## Features
 
@@ -104,6 +117,51 @@ To clean up the project by stopping and removing all containers, images, and bui
 docker-compose down --volumes --rmi all
 ```
 Remove the "--volumes" flag to preserve the volumes for future use (i.e. to keep the data).
+
+## Flowchart
+
+                                            USERS                                       
+                                            │││││                                       
+                                            │││││                                       
+                                            │││││                                       
+                                            ▼▼▼▼▼                                       
+                                      ┌───────────────┐                                 
+                                      │┌─────┐ ┌─────┐│                                 
+                     ┌─────────────── ││NGINX│ │NGINX││ ──────────────┐                 
+                     │                │└─────┘ └─────┘│               │                 
+                     │                └───────────────┘               │                 
+                     │                                                │                 
+                     │                                                │                 
+                     ▼                                                ▼                 
+┌─────────────────────────────────────────┐          ┌─────────────────────────────────┐
+│┌───────────┐ ┌───────────┐ ┌───────────┐│          │┌──────────────┐ ┌──────────────┐│
+││GAME SERVER│ │GAME SERVER│ │GAME SERVER││          ││NUMBER FACTORY│ │NUMBER FACTORY││
+││ (FASTAPI) │ │ (FASTAPI) │ │ (FASTAPI) ││          ││  (FASTAPI)   │ │  (FASTAPI)   ││
+│└───────────┘ └───────────┘ └───────────┘│          │└──────────────┘ └──────────────┘│
+└─────┬──────────────┬──────────────┬─────┘          └────────────────┬────────────────┘
+      │              │▲             │▲                                │▲                
+      │              ││             ││                                ││                
+      │              ││             ││                                ││                
+      │              ││             ││                                ││                
+      │              ▼│             ││                                ▼│                
+      │   ┌───────────┴────────┐    ││                     ┌───────────┴──────────┐     
+      │   │┌──────────────────┐│    ││                     │┌────────────────────┐│     
+      │   ││GAME STATE PRIMARY││    ││                     ││NUMBER STORE PRIMARY││     
+      │   ││     (REDIS)      ││    │└─────────────────────┤│      (REDIS)       ││     
+      │   │└──────────────────┘│    └─────────────────────►│└────────────────────┘│     
+      │   │┌──────────────────┐│                           │┌────────────────────┐│     
+      │   ││GAME STATE REPLICA││                           ││NUMBER STORE REPLICA││     
+      │   ││     (REDIS)      ││                           ││      (REDIS)       ││     
+      │   │└──────────────────┘│                           │└────────────────────┘│     
+      │   └────────────────────┘                           └──────────────────────┘     
+      │                                                                                 
+      │                                                                                 
+      │                            ┌────────────────┐                                   
+      │                            │┌──────────────┐│                                   
+      │                            ││STORAGE/BACKUP││                                   
+      └───────────────────────────►││ (POSTGRESQL) ││                                   
+                                   │└──────────────┘│                                   
+                                   └────────────────┘                                   
 
 
 ## TO DO List
