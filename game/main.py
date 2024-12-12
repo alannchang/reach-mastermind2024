@@ -83,7 +83,7 @@ async def start_game(request: NewGameRequest):
     game = GameSession(secret_code, total_random_nums=request.total_random_nums, max_attempts=request.max_attempts)
     save_game(session_id, game)
     redis_game_state.expire(session_id, GAME_SESSION_TIMEOUT)
-    return {"session_id": session_id, "message": "Game started!"}
+    return {"session_id": session_id, "message": f"Game started! You have {GAME_SESSION_TIMEOUT} seconds to guess the secret code before this session expires.  Good luck!"}
 
 
 @app.post("/guess")

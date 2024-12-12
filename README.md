@@ -108,10 +108,8 @@ docker-compose down --volumes --rmi all
 Note: removing volumes will remove all data including data stored on databases.
 
 ## TO DO List
-- Timestamps for game session management, auto-expiration, etc. 
 - Set up database (Postgres?) for persistent storage
 - Implement proper (input) data validation, especially for the player guesses
 - Implement a dashboard, logging, etc. for better visibility on system
 - Set up Redis Sentinels, Master-Slave architecture
-- Expiration timer if players take too long to complete a game
 
