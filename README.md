@@ -95,10 +95,16 @@ curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: app
       at its current IP address.  More details can be found at: https://www.random.org/clients/http/#quota
   - This endpoint is simply an internal wrapper of the quota checking API service provided by random.org.
 
+
+To stop all activity and remove all containers, images, and builds:
+```
+docker-compose down --volumes --rmi all
+```
+Note: removing volumes will remove all data including data stored on databases.
+
 ## TO DO List
 
 - Configure random number server so that random numbers are generated and added to redis number store on regular intervals
-- Configure game server to pull random numbers from redis number store
 - Implement measures to prevent redis number store from completely depleting
 - Implement proper (input) data validation, especially for the player guesses
 - Implement a dashboard, logging, etc. for better visibility on system

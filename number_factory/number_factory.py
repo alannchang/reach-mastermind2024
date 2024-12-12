@@ -2,7 +2,13 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from redis import Redis
 import json
+import asyncio
 import requests
+
+LOW_COUNT_THRESHOLD = 10    # qty where warning will be triggered
+AUTO_REGEN_THRESHOLD = 5    # qty where numbers will be added to number store automatically
+RESUPPLY_QTY = 15           # qty (1 <= qty <= 1000) to generate when auto_regen_threshold met
+CHECK_INTERVAL = 60         # seconds between automated checks
 
 RANDOM_NUM_API = 'https://www.random.org/integers/'
 QUOTA_API = 'https://www.random.org/quota/?format=plain'
@@ -20,7 +26,8 @@ class GenerateRequest(BaseModel):
 
 def generate_random_numbers(qty=4):
     '''
-    possible values for 'num'.....1-1000
+    Docs: https://www.random.org/clients/http/api/
+    Possible values for 'num'.....1-1000
     for generating in bulk, set to 1000 (see bulk_generate())
     '''
     params = {
@@ -45,10 +52,6 @@ def generate_random_numbers(qty=4):
             return []
 
 
-def bulk_generate():
-    return generate_random_numbers(1000)
-
-
 def check_quota():
     '''
     Documentation regarding quota/checker: https://www.random.org/clients/http/#quota
@@ -65,6 +68,23 @@ def check_quota():
     except requests.RequestException as e:
         print(f"Error fetching data from www.random.org: {e}")
         return ""
+
+async def monitor_num_store():
+    while True:
+        count = redis_client.llen("random_numbers")
+        if count < LOW_COUNT_THRESHOLD:
+            print("WARNING: RANDOM NUMBER STORE VOLUME LOWER THAN THRESHOLD!\n" * 3)
+        if count < AUTO_REGEN_THRESHOLD:
+            numbers = generate_random_numbers(RESUPPLY_QTY) 
+            redis_client.rpush("random_numbers", *numbers)
+            print(f"WARNING: AUTO-REGEN THRESHOLD REACHED, {RESUPPLY_QTY} numbers added.")
+
+        await asyncio.sleep(CHECK_INTERVAL)
+
+
+@app.on_event("startup")
+async def start_background_task():
+    asyncio.create_task(monitor_num_store())
 
 
 @app.get("/")
@@ -92,13 +112,11 @@ def generate(request: GenerateRequest):
     redis_client.rpush("random_numbers", *numbers)
 
     return {
-        "message": f"{len(numbers)} successfully generated and stored.",
-        "stored_numbers": numbers
+        "message": f"{len(numbers)} random number(s) generated and stored in Redis.",
     }
 
 '''
 To monitor redis activity while the serveris running:
-docker logs redis_number_store_primary
 docker exec -it redis_number_store_primary redis-cli monitor
 '''
 
