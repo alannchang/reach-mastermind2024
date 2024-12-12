@@ -98,7 +98,6 @@ curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: app
   - Send a GET request to check on your current bit allowance.  Your bit allowance is used for generating random numbers.
     - Once your bit allowance is exhausted, the number factory will not longer be able to generate new random numbers 
       at its current IP address.  More details can be found at: https://www.random.org/clients/http/#quota
-  - This endpoint is simply an internal wrapper of the quota checking API service provided by random.org.
 
 
 To stop all activity and remove all containers, images, and builds:

@@ -1,6 +1,7 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from redis import Redis
+from datetime import datetime
 import json
 import asyncio
 import requests
@@ -15,9 +16,7 @@ QUOTA_API = 'https://www.random.org/quota/?format=plain'
 
 app = FastAPI(root_path="/number_factory")
 
-redis_host = "redis_number_store_primary"
-redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
-
+redis_num_store = Redis(host="redis_number_store_primary", port=6379, decode_responses=True)
 
 # Request models
 class GenerateRequest(BaseModel):
@@ -54,11 +53,9 @@ def generate_random_numbers(qty=4):
 
 def check_quota():
     '''
-    Documentation regarding quota/checker: https://www.random.org/clients/http/#quota
+    Docs regard quota checker API endpoint: https://www.random.org/clients/http/#quota
     Base quota = 1,000,000 bits
-    Quota is decreased by number of bits required for each request
-    Every day, shortly after midnight UTC, all quotas with less than 1,000,000 bits receive a free top-up of 200,000 bits. 
-    If the server has spare capacity, you may get an additional free top-up earlier, but you should not count on it.
+    Quota is decreased by number of bits required for each request, replenished nightly.
     '''
     try:
         response = requests.get(QUOTA_API)
@@ -69,14 +66,15 @@ def check_quota():
         print(f"Error fetching data from www.random.org: {e}")
         return ""
 
-async def monitor_num_store():
+
+async def check_num_count():
     while True:
-        count = redis_client.llen("random_numbers")
+        count = redis_num_store.llen("random_numbers")
         if count < LOW_COUNT_THRESHOLD:
             print("WARNING: RANDOM NUMBER STORE VOLUME LOWER THAN THRESHOLD!\n" * 3)
         if count < AUTO_REGEN_THRESHOLD:
             numbers = generate_random_numbers(RESUPPLY_QTY) 
-            redis_client.rpush("random_numbers", *numbers)
+            redis_num_store.rpush("random_numbers", *numbers)
             print(f"WARNING: AUTO-REGEN THRESHOLD REACHED, {RESUPPLY_QTY} numbers added.")
 
         await asyncio.sleep(CHECK_INTERVAL)
@@ -84,7 +82,7 @@ async def monitor_num_store():
 
 @app.on_event("startup")
 async def start_background_task():
-    asyncio.create_task(monitor_num_store())
+    asyncio.create_task(check_num_count())
 
 
 @app.get("/")
@@ -109,7 +107,7 @@ def generate(request: GenerateRequest):
     if not numbers:
         raise HTTPException(status_code=500, detail="Error fetching random numbers.")
     
-    redis_client.rpush("random_numbers", *numbers)
+    redis_num_store.rpush("random_numbers", *numbers)
 
     return {
         "message": f"{len(numbers)} random number(s) generated and stored in Redis.",

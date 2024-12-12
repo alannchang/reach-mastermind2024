@@ -10,7 +10,7 @@ redis_client = Redis(host=redis_host, port=6379, decode_responses=True)
 class GameSession:
 
 
-    def __init__(self, secret_code, total_random_nums=4, max_attempts=10, attempts_remaining=None, history=None, victory=False):
+    def __init__(self, secret_code, max_attempts=10, attempts_remaining=None, history=None, victory=False, timestamp=None):
         self.secret_code = secret_code
         self.max_attempts = max_attempts
         self.attempts_remaining = attempts_remaining if attempts_remaining is not None else max_attempts
