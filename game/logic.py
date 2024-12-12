@@ -1,5 +1,6 @@
 import random
 import json
+from datetime import datetime
 from redis import Redis
 
 redis_host = "redis_number_store_primary"
@@ -15,6 +16,7 @@ class GameSession:
         self.attempts_remaining = attempts_remaining if attempts_remaining is not None else max_attempts
         self.history = history if history is not None else []
         self.victory = False
+        self.timestamp = datetime.now().replace(microsecond=0)
 
 
     def validate_input(self, player_code):
@@ -75,6 +77,7 @@ class GameSession:
                 "attempts_remaining": self.attempts_remaining,
                 "victory": int(self.victory),
                 "history": json.dumps(self.history) if self.history else "[]"
+                "timestamp":self.timestamp.isoformat()
                 }
 
 
@@ -95,10 +98,11 @@ class GameSession:
                 attempts_remaining=int(data.get("attempts_remaining")),
                 victory=bool(int(data.get("victory"))),
                 history=history
+                timestamp=datetime.fromisoformat(data["timestamp"])
                 )
 
 
-# Functions used for standalone CLI version of the game:
+# Functions used for CLI version of the game
 
     '''
     def print_result(self, correct_num, correct_loc): 

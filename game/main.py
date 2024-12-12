@@ -7,10 +7,11 @@ import json
 
 from logic import GameSession
 
+GAME_SESSION_TIMEOUT = 300      # Games will expire 5 minutes from creation
+
 app = FastAPI(root_path="/mastermind")
 
-
-# Connect to both game state and number store Redis instances
+# Connect to both game state and number store
 redis_game_state = Redis(host="redis_game_state_primary", port=6379, decode_responses=True)
 redis_num_store = Redis(host="redis_number_store_primary", port=6379, decode_responses=True)
 
@@ -72,7 +73,7 @@ async def start_game(request: NewGameRequest):
     Args:
         {"total_random_nums": 4, "max_attempts": 10}
     Returns:
-        {"session_id": session_id, "message": "Game started!"}
+        {"session_id": session_id, "message": "Game started! You have {GAME_SESSION_TIMEOUT} seconds to guess the secret code before this session expires.  Good luck!"}
     '''
     secret_code = generate_secret_code(request.total_random_nums)
     if not secret_code:
@@ -81,6 +82,7 @@ async def start_game(request: NewGameRequest):
     session_id = str(uuid.uuid4())
     game = GameSession(secret_code, total_random_nums=request.total_random_nums, max_attempts=request.max_attempts)
     save_game(session_id, game)
+    redis_game_state.expire(session_id, GAME_SESSION_TIMEOUT)
     return {"session_id": session_id, "message": "Game started!"}
 
 
@@ -102,7 +104,7 @@ async def guess(request: GuessRequest):
     # Fetch the game session
     game = load_game(session_id)
     if not game:
-        raise HTTPException(status_code=404, detail="Unable to locate game session.")
+        raise HTTPException(status_code=404, detail="Unable to locate game session.  Session may have timed out.")
 
     if game.victory:
         return {"message": "Game already won!", "secret_code": game.secret_code}
