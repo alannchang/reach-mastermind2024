@@ -21,8 +21,11 @@ class GameSession:
         self.victory = False
         self.timestamp = datetime.now().replace(microsecond=0)
 
-    def validate_input(self, player_code):
+    def valid_len(self, player_code):
         return len(player_code) == len(self.secret_code)
+
+    def in_range(self, player_code):
+        return all(0 <= num <= 7 for num in player_code)
 
     def code_check(self, player_code):
         correct_num, correct_loc = self.find_matches(player_code)

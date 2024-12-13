@@ -43,7 +43,7 @@ def save_game(session_id: str, game: GameSession):
     redis_game_state.hset(session_id, mapping=data)
 
 
-def load_game(session_id: str) -> GameSession:
+def load_game(session_id: str):
     data = redis_game_state.hgetall(session_id)
     if not data:
         return None
@@ -55,6 +55,11 @@ def load_game(session_id: str) -> GameSession:
     data["attempts_remaining"] = int(data["attempts_remaining"])
     data["victory"] = data["victory"].lower() == "true"
     return GameSession.from_dict(data)
+
+
+def remove_game(session_id: str):
+    result = redis_game_state.delete(session_id)
+    return result > 0
 
 
 def generate_secret_code(qty):
@@ -124,30 +129,33 @@ async def guess(request: GuessRequest):
             status_code=404,
             detail="Unable to locate game session.  Session may have timed out.",
         )
-
+    '''
     if game.victory:
         return {"message": "Game already won!", "secret_code": game.secret_code}
-
+    '''
     if game.attempts_remaining <= 0:
         return {
             "message": "Game over. You've used all attempts.",
             "secret_code": game.secret_code,
         }
 
-    if not game.validate_input(player_code):
+    if not game.valid_len(player_code):
         raise HTTPException(status_code=400, detail="Invalid input length.")
+
+    if not game.in_range(player_code):
+        raise HTTPException(status_code=400, detail="Please select numbers within the range of 0 to 7.")
 
     correct_num, correct_loc = game.code_check(player_code)
 
     save_game(session_id, game)
 
-    if game.victory:
+    if game.victory and remove_game(session_id):
         return {
             "message": "You win! Start a new game session to play again.",
             "secret_code": game.secret_code,
         }
 
-    if game.attempts_remaining <= 0:
+    if game.attempts_remaining <= 0 and remove_game(session_id):
         return {
             "message": "You lose! Start a new game session to try again.",
             "secret_code": game.secret_code,
