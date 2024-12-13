@@ -43,7 +43,7 @@ Git clone to download the repo:
 git clone https://github.com/alannchang/reach-mastermind2024.git
 ```
 
-Assuming you have Docker Engine installed and running, run these docker commands in the project directory:
+Assuming you have Docker Engine and Compose installed and running, run these docker commands in the project directory:
 ```
 docker compose build
 docker compose up -d
@@ -53,7 +53,7 @@ The servers will be running in Docker containers now.
 
 At this point, there are two ways to play the game in its current state:
 - Manually sending API requests (using the curl command)
-- By accessing the FastAPI docs for the game server and sending requests from there 
+- By accessing the FastAPI docs from the browser and sending requests from there 
   - Swagger UI interactive documentation:
     - http://localhost:80/mastermind/docs
     - http://localhost:80/number_factory/docs
@@ -107,7 +107,7 @@ curl -X POST "http://127.0.0.1:80/mastermind/end_game" -H "Content-Type: applica
 
 - POST /number_factory/generate
   - Send a POST request to generate random numbers using the random.org API.  Please use sparingly and generate only what you
-    need.  1-1000 numbers can be generated per request. 
+    need.  1-1000 random numbers can be generated per request. 
 
 Example using curl:
 ```
@@ -195,7 +195,7 @@ Docker was used in this project for the following reasons:
 - consistency and reproducibility across different OSes
 - easier to run applications relying on multiple services
 
-Nginx was used for load balancing (round robin).
+Nginx was used for load balancing (round robin) for both game server and number factory clusters.
 
 UUID was used over IP addresses as an identifier for unique game sessions for the following reasons:
 - Two or more users who share the same IP address (e.g. same household, same router) would not be able
@@ -209,7 +209,7 @@ Because of the short duration given for the completion of this project, manual t
 ensure that essential features and functionalities were thoroughly validated.  In hindsight, incorporating
 automated testing at some stage might have been beneficial and could have saved me some time.
 
-From the project directory, there are two directories, "game" and "number_factory":
+Inside the project directory, there are two directories, "game" and "number_factory":
 
 Game:
 - logic.py: where the actual "Mastermind" game logic resides and can be altered into a standalone CLI game
@@ -234,7 +234,7 @@ Other extensions include but are not limited to:
 - Input/data validation using Pydantic
 - Error handling
 - API documentation (SwaggerUI/ReDoc)
-- A separate server, or "number_factory", that generates random numbers using the random.org API, 
+- A separate "number_factory" server that generates random numbers using the random.org API, 
   stores them in a database for use, and automatically replenishes the database when supply gets low.
 
 
@@ -242,16 +242,18 @@ Extensions that were attempted:
 - A database (like MySQL, PostgreSQL) that will act as persistent storage/backup for game state
 - Multiple Nginx instances for redundancy, but sharing the same port number. 
 
+
 I initially considered, but later overlooked, an approach where I would pre-generate and store 
 the daily allotment of random numbers (200,000) in a persistent database, such as MySQL or PostgreSQL, 
 for future retrieval and use.
 
 ## TO DO List
 - Set up some way to rate limit requests made to API 
-- Implement error messaging in case any server or database goes down or is unavailable for any reason
+- Implement error messaging in the case of any server or database that goes down or is unavailable for any reason
 - Set up database (MySQL?) for persistent storage
-- Implement a central dashboard, logging, etc. for better visibility on system
+- Implement a central dashboard, logging, etc. for better visibility and monitoring
 - Set up Redis Sentinel so that if primary fails, replica can take over
 - Create automated tests to test endpoints, stress test the system, etc.
 - Consider WebSockets over REST, or maybe even WASM
 - Consider using something like Apache Kafka and using microservice architecture as more features get added
+  and the application becomes more complex
