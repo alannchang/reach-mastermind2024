@@ -195,6 +195,12 @@ Docker was used in this project for the following reasons:
 - consistency and reproducibility across different OSes
 - easier to run applications relying on multiple services
 
+Redis was used in this project for the following reasons:
+- extremely fast performance
+- versatile data structures available (a doubly linked list for number_store, dictionary for game_state)
+- can act as a persistent database, although it is probably more costly than other options
+- scalability through clustering
+
 Nginx was used for load balancing (round robin) for both game server and number factory clusters.
 
 UUID was used over IP addresses as an identifier for unique game sessions for the following reasons:
@@ -251,6 +257,7 @@ for future retrieval and use.
 - Set up some way to rate limit requests made to API. 
 - Implement error messaging in the case of any server or database that goes down or is unavailable for any reason.
 - Set up database (MySQL?) for persistent storage.
+- Consider aioredis for asynchronous Redis operations.
 - Implement a central dashboard, logging, etc. for better visibility and monitoring.
 - Set up some form of automated testing to save time, crush bugs, and increase test coverage.
 - Set up Redis Sentinel so that if primary fails, replica can take over.
