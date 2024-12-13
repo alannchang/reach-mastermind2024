@@ -237,6 +237,7 @@ Game extensions include but are not limited to:
 
 
 Other extensions include but are not limited to:
+- Servers are stateless; all data is stored on databases, allowing for horizontal scalability
 - Input/data validation using Pydantic
 - Error handling
 - API documentation (SwaggerUI/ReDoc)
