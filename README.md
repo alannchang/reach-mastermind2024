@@ -34,7 +34,7 @@ Any choice/combination of programming languages, tools, frameworks, etc. are per
 - Nginx (load balancing) 
 - Docker
 - Redis (caching)
-- 
+- MySQL (?) 
 
 ## How to get started
 
@@ -51,10 +51,9 @@ docker compose up -d
 
 The servers will be running in Docker containers now.
 
-At this point, there are many ways to play the game in its current state:
+At this point, there are two ways to play the game in its current state:
 - Manually sending API requests (using the curl command)
 - By accessing the FastAPI docs for the game server and sending requests from there 
-- By executing the play.py (in progress) script
 
 ### Game server API endpoints:
 
@@ -92,6 +91,14 @@ Example using curl:
 curl -X POST "http://127.0.0.1:80/mastermind/stats" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
 ```
 
+- POST /mastermind/end_game
+  - Send a POST request with your "session_id" to end your game session
+
+Example using curl:
+```
+curl -X POST "http://127.0.0.1:80/mastermind/end_game" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
+```
+
 ### Number Factory API endpoints:
 
 - POST /number_factory/generate
@@ -114,7 +121,7 @@ docker-compose down --volumes --rmi all
 ```
 Remove the "--volumes" flag to preserve the volumes for future use (i.e. to keep the data).
 
-## Flowchart
+## Implementation Details and Rationale
 
 ```
                                             USERS                                       
@@ -156,14 +163,56 @@ Remove the "--volumes" flag to preserve the volumes for future use (i.e. to keep
       │                            ┌────────────────┐                                   
       │                            │┌──────────────┐│                                   
       │                            ││STORAGE/BACKUP││                                   
-      └───────────────────────────►││ (POSTGRESQL) ││                                   
+      └───────────────────────────►││   (MySQL)    ││                                   
                                    │└──────────────┘│                                   
                                    └────────────────┘                                   
 ```
 
+When considering which language to use, Python was selected over C++ for the following reasons:
+- rapid development time
+- extensive libraries, especially for backend frameworks
+- ease of use
+
+When considering backend frameworks, FastAPI was selected over Flask for the following reasons:
+- performance (one of the fastest python web frameworks)
+- excellent async support
+- automated API generation (SwaggerUI and ReDoc)
+
+Docker was used in this project for the following reasons:
+- easy deployment and scaling
+- consistency and reproducibility across different OSes
+- easier to run applications relying on multiple services
+
+Nginx was used for load balancing (round robin).
+
+
+From the project directory, there are two directories, "game" and "number_factory":
+
+Game:
+- logic.py: where the actual "Mastermind" game logic resides and can be altered into a standalone CLI game
+- main.py: imports from logic.py to integrate the game logic into a functioning API server
+
+Number_factory:
+- number_factory.py: responsible for managing random number generation, supply, etc.
+
+
+### Additional Extensions 
+
+Game Extensions include but are not limited to:
+- Ability to adjust the number of random numbers in the mastermind code
+- Ability to decide how many attempts can be made before the game is over
+- Games will automatically expire after 5 minutes (developer can adjust this)
+- Games will automatically expire after the player either wins or runs out of guesses
+- Ability to end games prematurely
+- Players can share their session_id with others if they want to "collaborate"
+
+
 ## TO DO List
-- Set up database (Postgres?) for persistent storage
-- Utilize pydantic more to proper data/input validation
+- Set up some way to rate limit requests made to API 
+- Implement error messaging in case Redis goes down or is unavailable for any reason
+- Set up database (MySQL?) for persistent storage
 - Implement a dashboard, logging, etc. for better visibility on system
 - Set up Redis Sentinels, Master-Slave architecture
-
+- Create automated tests to test endpoints, stress test the system, etc.
+- Consider WebSockets over REST, or maybe even WASM
+- Consider using something like Apache Kafka and using microservice architecture as more features get added

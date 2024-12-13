@@ -38,6 +38,10 @@ class StatsRequest(BaseModel):
     session_id: str
 
 
+class EndGameRequest(BaseModel):
+    session_id: str
+
+
 def save_game(session_id: str, game: GameSession):
     data = game.to_dict()
     redis_game_state.hset(session_id, mapping=data)
@@ -122,28 +126,20 @@ async def guess(request: GuessRequest):
     session_id = request.session_id
     player_code = request.guess
 
-    # Fetch the game session
     game = load_game(session_id)
     if not game:
         raise HTTPException(
             status_code=404,
             detail="Unable to locate game session.  Session may have timed out.",
         )
-    '''
-    if game.victory:
-        return {"message": "Game already won!", "secret_code": game.secret_code}
-    '''
-    if game.attempts_remaining <= 0:
-        return {
-            "message": "Game over. You've used all attempts.",
-            "secret_code": game.secret_code,
-        }
 
     if not game.valid_len(player_code):
         raise HTTPException(status_code=400, detail="Invalid input length.")
 
     if not game.in_range(player_code):
-        raise HTTPException(status_code=400, detail="Please select numbers within the range of 0 to 7.")
+        raise HTTPException(
+            status_code=400, detail="Please select numbers within the range of 0 to 7."
+        )
 
     correct_num, correct_loc = game.code_check(player_code)
 
@@ -188,3 +184,21 @@ async def retrieve_stats(request: StatsRequest):
         "max_attempts": game.max_attempts,
         "history": game.history,
     }
+
+
+@app.post("/end_game")
+async def end_game(request: EndGameRequest):
+    """
+    Manually end a game session.
+    Args:
+        session_id (str): The ID provided when you started your game session.
+    Returns:
+        None
+    """
+    if remove_game(request.session_id):
+        return {
+            "session_id": request.session_id,
+            "message": "Game session successfully removed.",
+        }
+    else:
+        raise HTTPException(status_code=404, detail="Game session not found.")
