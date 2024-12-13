@@ -54,6 +54,12 @@ The servers will be running in Docker containers now.
 At this point, there are two ways to play the game in its current state:
 - Manually sending API requests (using the curl command)
 - By accessing the FastAPI docs for the game server and sending requests from there 
+  - Swagger UI interactive documentation:
+    - http://localhost:80/mastermind/docs
+    - http://localhost:80/number_factory/docs
+  - ReDoc interative documentation:
+    - http://localhost:80/mastermind/redoc
+    - http://localhost:80/number_factory/redoc
 
 ### Game server API endpoints:
 
@@ -63,36 +69,34 @@ At this point, there are two ways to play the game in its current state:
     - You'll receive a session_id to track your game session. Please keep this session_id.
 
 Example using curl:
-
 ```
 curl -X POST "http://127.0.0.1:80/mastermind/start_game" -H "Content-Type: application/json" -d '{"total_random_nums": 4, "max_attempts": 10}'
 ```
 
 - POST /mastermind/guess
-    - Send a POST request using the "session_id" provided from "start_game" request and your guess (list of integers).
+    - Send a POST request using the "session_id" provided from "start_game" request and your guess (list of integers within 
+      the range of 0 to 7).
     - You'll receive a response indicating how many numbers and positions are correct, and how many attempts are remaining.
 
 Example using curl:
-
 ```
 curl -X POST "http://127.0.0.1:80/mastermind/guess" -H "Content-Type: application/json" -d '{"session_id": "your-session-id", "guess": [1, 2, 3, 4]}'
 ```
 
 - POST /mastermind/stats
-  - Send a POST request with your "session_id" to get information on your game session
+  - Send a POST request with your "session_id" to get information on your game session.
   - Information provided includes:
     - Maximum number of attempts
     - Number of attempts remaining
     - Prior history of guesses
 
 Example using curl:
-
 ```
 curl -X POST "http://127.0.0.1:80/mastermind/stats" -H "Content-Type: application/json" -d '{"session_id": "your-session-id"}'
 ```
 
 - POST /mastermind/end_game
-  - Send a POST request with your "session_id" to end your game session
+  - Send a POST request with your "session_id" to end your game session.
 
 Example using curl:
 ```
@@ -102,18 +106,23 @@ curl -X POST "http://127.0.0.1:80/mastermind/end_game" -H "Content-Type: applica
 ### Number Factory API endpoints:
 
 - POST /number_factory/generate
-  - Send a POST request to generate random numbers 
+  - Send a POST request to generate random numbers using the random.org API.  Please use sparingly and generate only what you
+    need.  1-1000 numbers can be generated per request. 
 
 Example using curl:
-
 ```
 curl -X POST "http://127.0.0.1:80/number_factory/generate" -H "Content-Type: application/json" -d '{"qty": 4}'
 ```
 
 - GET /number_factory/quota
   - Send a GET request to check on your current bit allowance.  Your bit allowance is used for generating random numbers.
-    - Once your bit allowance is exhausted, the number factory will not longer be able to generate new random numbers 
-      at its current IP address.  More details can be found at: https://www.random.org/clients/http/#quota
+  - Once your bit allowance is exhausted, the number factory will not longer be able to generate new random numbers 
+    at its current IP address.  More details can be found at: https://www.random.org/clients/http/#quota
+
+Example using curl:
+```
+curl -X GET "http://127.0.0.1:80/number_factory/quota"
+```
 
 To clean up the project by stopping and removing all containers, images, and builds:
 ```
