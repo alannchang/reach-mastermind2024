@@ -3,20 +3,26 @@ from datetime import datetime
 
 
 class GameSession:
-
-
-    def __init__(self, secret_code, max_attempts=10, attempts_remaining=None, history=None, victory=False, timestamp=None):
+    def __init__(
+        self,
+        secret_code,
+        max_attempts=10,
+        attempts_remaining=None,
+        history=None,
+        victory=False,
+        timestamp=None,
+    ):
         self.secret_code = secret_code
         self.max_attempts = max_attempts
-        self.attempts_remaining = attempts_remaining if attempts_remaining is not None else max_attempts
+        self.attempts_remaining = (
+            attempts_remaining if attempts_remaining is not None else max_attempts
+        )
         self.history = history if history is not None else []
         self.victory = False
         self.timestamp = datetime.now().replace(microsecond=0)
 
-
     def validate_input(self, player_code):
         return len(player_code) == len(self.secret_code)
-
 
     def code_check(self, player_code):
         correct_num, correct_loc = self.find_matches(player_code)
@@ -25,7 +31,6 @@ class GameSession:
         if correct_loc == len(self.secret_code):
             self.victory = True
         return correct_num, correct_loc
-
 
     def find_matches(self, player_code):
         correct_num = 0
@@ -40,7 +45,7 @@ class GameSession:
             else:
                 incorrect_secret.append(self.secret_code[i])
                 incorrect_player.append(player_code[i])
-        
+
         secret_count = {}
 
         for num in incorrect_secret:
@@ -53,28 +58,29 @@ class GameSession:
 
         return correct_num, correct_loc
 
-
     def record_history(self, player_code, correct_num, correct_loc):
         self.history.append(
-                {
+            {
                 "player input": player_code,
                 "correct number": correct_num,
                 "correct location": correct_loc,
                 "attempts remaining": self.attempts_remaining,
-                }
+            }
         )
-    
+
+    # Functions used for serializing and deserialzing for use with Redis
 
     def to_dict(self):
         return {
-                "secret_code": json.dumps(self.secret_code) if isinstance(self.secret_code, list) else self.secret_code,
-                "max_attempts": self.max_attempts,
-                "attempts_remaining": self.attempts_remaining,
-                "victory": int(self.victory),
-                "history": json.dumps(self.history) if self.history else "[]",
-                "timestamp": self.timestamp.isoformat()
-                }
-
+            "secret_code": json.dumps(self.secret_code)
+            if isinstance(self.secret_code, list)
+            else self.secret_code,
+            "max_attempts": self.max_attempts,
+            "attempts_remaining": self.attempts_remaining,
+            "victory": int(self.victory),
+            "history": json.dumps(self.history) if self.history else "[]",
+            "timestamp": self.timestamp.isoformat(),
+        }
 
     @staticmethod
     def from_dict(data):
@@ -88,18 +94,17 @@ class GameSession:
             history = json.loads(history)
 
         return GameSession(
-                secret_code=secret_code,
-                max_attempts=int(data.get("max_attempts")),
-                attempts_remaining=int(data.get("attempts_remaining")),
-                victory=bool(int(data.get("victory"))),
-                history=history,
-                timestamp=datetime.fromisoformat(data["timestamp"])
-                )
+            secret_code=secret_code,
+            max_attempts=int(data.get("max_attempts")),
+            attempts_remaining=int(data.get("attempts_remaining")),
+            victory=bool(int(data.get("victory"))),
+            history=history,
+            timestamp=datetime.fromisoformat(data["timestamp"]),
+        )
 
+    # Functions used for CLI version of the game
 
-# Functions used for CLI version of the game
-
-    '''
+    """
     def print_result(self, correct_num, correct_loc): 
         if correct_num == 0 and correct_loc == 0:
             print("All incorrect.")
@@ -112,10 +117,9 @@ class GameSession:
 
         self.max_attempts -= 1
         print(f"{self.max_attempts} attempts remaining.")
-    '''
+    """
 
-
-    '''
+    """
     def game_loop(self):
         print(self.secret_code)     # For debugging
         
@@ -132,4 +136,4 @@ class GameSession:
             print("YOU WIN!")
         else:
             print("YOU LOSE!")
-    '''
+    """
