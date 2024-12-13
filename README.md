@@ -191,7 +191,6 @@ Nginx was used for load balancing (round robin).
 Throughout the project, consideration was given to scalability, redundancy, and performance to 
 create a robust and efficient backend.
 
-___
 
 From the project directory, there are two directories, "game" and "number_factory":
 
@@ -215,7 +214,7 @@ Game Extensions include but are not limited to:
 
 Extensions that were attempted:
 - A database (like MySQL, PostgreSQL) that will act as persistent storage/backup for game state
-- Flask was initially used, but promptly switched over to FastAPI for performance
+- Multiple Nginx instances for redundancy, but sharing the same IP and port. 
 
 
 ## TO DO List
