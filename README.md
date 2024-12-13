@@ -218,13 +218,16 @@ Other extensions include but are not limited to:
 - Error handling
 - API documentation (SwaggerUI/ReDoc)
 - A separate server, or "number_factory", that generates random numbers using random.org, stores
-  them in a database for use, and replenishes the database as needed.
+  them in a database for use, and automatically replenishes the database when supply gets low.
 
 
 Extensions that were attempted:
 - A database (like MySQL, PostgreSQL) that will act as persistent storage/backup for game state
 - Multiple Nginx instances for redundancy, but sharing the same IP and port. 
 
+I initially considered, but later overlooked, an approach where I would pre-generate and store 
+the daily allotment of random numbers (200,000) in a persistent database, such as MySQL or PostgreSQL, 
+for future retrieval and use.
 
 ## TO DO List
 - Set up some way to rate limit requests made to API 
