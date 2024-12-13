@@ -31,9 +31,9 @@ Any choice/combination of programming languages, tools, frameworks, etc. are per
 ## Stack/Technologies
 
 - FastAPI 
-- Nginx (load balancing) 
+- Nginx
 - Docker
-- Redis (caching)
+- Redis
 - MySQL (?) 
 
 ## How to get started
@@ -188,7 +188,12 @@ Docker was used in this project for the following reasons:
 
 Nginx was used for load balancing (round robin).
 
-Throughout the project, consideration was given to scalability, redundancy, and performance to 
+UUID was used over IP addresses for game sessions for the following reasons:
+- Two or more users who share the same IP address (e.g. same household, same router) would not be able
+  to have their own game sessions
+- By generating UUIDs for each new game, users can share them with other users to enable "multiplayer" 
+
+Throughout the project, special consideration was given to scalability, redundancy, and performance to 
 create a robust and efficient backend.
 
 
@@ -214,7 +219,7 @@ Game extensions include but are not limited to:
 
 
 Other extensions include but are not limited to:
-- Data validation using Pydantic
+- Input/data validation using Pydantic
 - Error handling
 - API documentation (SwaggerUI/ReDoc)
 - A separate server, or "number_factory", that generates random numbers using random.org, stores
