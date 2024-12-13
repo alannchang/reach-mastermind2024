@@ -163,7 +163,7 @@ Remove the "--volumes" flag to preserve the volumes for future use (i.e. to keep
       │                            ┌────────────────┐                                   
       │                            │┌──────────────┐│                                   
       │                            ││STORAGE/BACKUP││                                   
-      └───────────────────────────►││   (MySQL)    ││                                   
+      └───────────────────────────►││   (MySQL?)   ││                                   
                                    │└──────────────┘│                                   
                                    └────────────────┘                                   
 ```
@@ -188,7 +188,7 @@ Docker was used in this project for the following reasons:
 
 Nginx was used for load balancing (round robin).
 
-UUID was used over IP addresses for game sessions for the following reasons:
+UUID was used over IP addresses as an identifier for unique game sessions for the following reasons:
 - Two or more users who share the same IP address (e.g. same household, same router) would not be able
   to have their own game sessions
 - By generating UUIDs for each new game, users can share them with other users to enable "multiplayer" 
@@ -196,6 +196,9 @@ UUID was used over IP addresses for game sessions for the following reasons:
 Throughout the project, special consideration was given to scalability, redundancy, and performance to 
 create a robust and efficient backend.
 
+Because of the short duration given for the completion of this project, manual testing was conducted to
+ensure that essential features and functionalities were thoroughly validated.  In hindsight, incorporating
+automated testing at some stage might have been beneficial and could have saved me some time.
 
 From the project directory, there are two directories, "game" and "number_factory":
 
@@ -212,23 +215,23 @@ Number_factory:
 Game extensions include but are not limited to:
 - Ability to adjust the number of random numbers in the mastermind code
 - Ability to decide how many attempts can be made before the game is over
-- Games will automatically expire after 5 minutes (developer can adjust this)
-- Games will automatically expire after the player either wins or runs out of guesses
+- Game sessions will automatically expire after 5 minutes (developer can adjust this)
+- Game sessions will automatically expire after the player either wins or runs out of guesses
 - Ability to end games prematurely
-- Players can share their session_id with others if they want to "collaborate"
+- Players can share their session_id with others if they want to "collaborate" with others
 
 
 Other extensions include but are not limited to:
 - Input/data validation using Pydantic
 - Error handling
 - API documentation (SwaggerUI/ReDoc)
-- A separate server, or "number_factory", that generates random numbers using random.org, stores
-  them in a database for use, and automatically replenishes the database when supply gets low.
+- A separate server, or "number_factory", that generates random numbers using the random.org API, 
+  stores them in a database for use, and automatically replenishes the database when supply gets low.
 
 
 Extensions that were attempted:
 - A database (like MySQL, PostgreSQL) that will act as persistent storage/backup for game state
-- Multiple Nginx instances for redundancy, but sharing the same IP and port. 
+- Multiple Nginx instances for redundancy, but sharing the same port number. 
 
 I initially considered, but later overlooked, an approach where I would pre-generate and store 
 the daily allotment of random numbers (200,000) in a persistent database, such as MySQL or PostgreSQL, 
@@ -236,10 +239,10 @@ for future retrieval and use.
 
 ## TO DO List
 - Set up some way to rate limit requests made to API 
-- Implement error messaging in case Redis goes down or is unavailable for any reason
+- Implement error messaging in case any server or database goes down or is unavailable for any reason
 - Set up database (MySQL?) for persistent storage
-- Implement a dashboard, logging, etc. for better visibility on system
-- Set up Redis Sentinels, Master-Slave architecture
+- Implement a central dashboard, logging, etc. for better visibility on system
+- Set up Redis Sentinel so that if primary fails, replica can take over
 - Create automated tests to test endpoints, stress test the system, etc.
 - Consider WebSockets over REST, or maybe even WASM
 - Consider using something like Apache Kafka and using microservice architecture as more features get added
