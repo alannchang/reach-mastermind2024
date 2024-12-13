@@ -248,12 +248,13 @@ the daily allotment of random numbers (200,000) in a persistent database, such a
 for future retrieval and use.
 
 ## TO DO List
-- Set up some way to rate limit requests made to API 
-- Implement error messaging in the case of any server or database that goes down or is unavailable for any reason
-- Set up database (MySQL?) for persistent storage
-- Implement a central dashboard, logging, etc. for better visibility and monitoring
-- Set up Redis Sentinel so that if primary fails, replica can take over
+- Set up some way to rate limit requests made to API. 
+- Implement error messaging in the case of any server or database that goes down or is unavailable for any reason.
+- Set up database (MySQL?) for persistent storage.
+- Implement a central dashboard, logging, etc. for better visibility and monitoring.
+- Set up some form of automated testing to save time, crush bugs, and increase test coverage.
+- Set up Redis Sentinel so that if primary fails, replica can take over.
 - Create automated tests to test endpoints, stress test the system, etc.
-- Consider WebSockets over REST, or maybe even WASM
+- Consider WebSockets over REST, or maybe even WASM.
 - Consider using something like Apache Kafka and using microservice architecture as more features get added
-  and the application becomes more complex
+  and the application becomes more complex.
