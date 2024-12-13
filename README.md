@@ -178,6 +178,9 @@ When considering backend frameworks, FastAPI was selected over Flask for the fol
 - excellent async support
 - automated API generation (SwaggerUI and ReDoc)
 
+I considered using Apache Kafka but decided that the project would not be big enough to merit use
+of a microservice architecture.  That could change if I were to continue working on this project.
+
 Docker was used in this project for the following reasons:
 - easy deployment and scaling
 - consistency and reproducibility across different OSes
@@ -185,6 +188,10 @@ Docker was used in this project for the following reasons:
 
 Nginx was used for load balancing (round robin).
 
+Throughout the project, consideration was given to scalability, redundancy, and performance to 
+create a robust and efficient backend.
+
+___
 
 From the project directory, there are two directories, "game" and "number_factory":
 
@@ -205,6 +212,10 @@ Game Extensions include but are not limited to:
 - Games will automatically expire after the player either wins or runs out of guesses
 - Ability to end games prematurely
 - Players can share their session_id with others if they want to "collaborate"
+
+Extensions that were attempted:
+- A database (like MySQL, PostgreSQL) that will act as persistent storage/backup for game state
+- Flask was initially used, but promptly switched over to FastAPI for performance
 
 
 ## TO DO List
