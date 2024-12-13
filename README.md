@@ -204,13 +204,22 @@ Number_factory:
 
 ### Additional Extensions 
 
-Game Extensions include but are not limited to:
+Game extensions include but are not limited to:
 - Ability to adjust the number of random numbers in the mastermind code
 - Ability to decide how many attempts can be made before the game is over
 - Games will automatically expire after 5 minutes (developer can adjust this)
 - Games will automatically expire after the player either wins or runs out of guesses
 - Ability to end games prematurely
 - Players can share their session_id with others if they want to "collaborate"
+
+
+Other extensions include but are not limited to:
+- Data validation using Pydantic
+- Error handling
+- API documentation (SwaggerUI/ReDoc)
+- A separate server, or "number_factory", that generates random numbers using random.org, stores
+  them in a database for use, and replenishes the database as needed.
+
 
 Extensions that were attempted:
 - A database (like MySQL, PostgreSQL) that will act as persistent storage/backup for game state
