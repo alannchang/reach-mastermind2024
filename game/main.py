@@ -1,6 +1,5 @@
 from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
-from typing import List
 from redis import Redis
 import uuid
 import json
@@ -17,8 +16,8 @@ redis_num_store = Redis(host="redis_number_store_primary", port=6379, decode_res
 
 # Request models
 class NewGameRequest(BaseModel):
-    total_random_nums: int = 4
-    max_attempts: int = 10
+    total_random_nums: int
+    max_attempts: int
 
 
 class GuessRequest(BaseModel):
@@ -32,7 +31,7 @@ class StatsRequest(BaseModel):
 
 def save_game(session_id: str, game: GameSession):
     data = game.to_dict()
-    print("Saving to Redis:", data)      # debug
+    print("Saving to Redis:", data)
     redis_game_state.hset(session_id, mapping=game.to_dict())
 
 
@@ -40,7 +39,7 @@ def load_game(session_id: str) -> GameSession:
     data = redis_game_state.hgetall(session_id)
     if not data:
         return None
-    print("Loaded from Redis:", data)   # debug
+    print("Loaded from Redis:", data)
 
     data["secret_code"] = json.loads(data["secret_code"])
     data["history"] = json.loads(data["history"])

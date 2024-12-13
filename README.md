@@ -163,7 +163,7 @@ Remove the "--volumes" flag to preserve the volumes for future use (i.e. to keep
 
 ## TO DO List
 - Set up database (Postgres?) for persistent storage
-- Implement proper (input) data validation, especially for the player guesses
+- Utilize pydantic more to proper data/input validation
 - Implement a dashboard, logging, etc. for better visibility on system
 - Set up Redis Sentinels, Master-Slave architecture
 
